@@ -61,6 +61,7 @@ public class User {
     }
 
     public String toString() {
+        // Проверка на добавление строк в другой репозиторий
         return  "User -> " + this.getId() + ". Имя : " + this.getName() + " " + this.getLastName() + ", Возраст : " + this.getAge();
     }
 }
