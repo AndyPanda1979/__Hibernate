@@ -10,19 +10,19 @@ import java.sql.*;
 public class Main {
     public static void main(String[] args) throws SQLException {
 
-        //   ******   jdbc   ******   //
-        UserDaoJDBCImpl jdbcService = new UserDaoJDBCImpl();
-        jdbcService.createUsersTable();
-        System.out.println("JDBC");
-        jdbcService.saveUser("Юрий", "Гагарин", (byte) 35);
-        jdbcService.saveUser("Пётр", "Великий", (byte) 37);
-        jdbcService.saveUser("Валентина", "Терешкова", (byte) 30);
-        jdbcService.saveUser("Александра", "Потанина", (byte) 32);
-        for (User item: jdbcService.getAllUsers()) {
-            System.out.println(item);
-        }
-        jdbcService.cleanUsersTable();
-        jdbcService.dropUsersTable();
+//        //   ******   jdbc   ******   //
+//        UserDaoJDBCImpl jdbcService = new UserDaoJDBCImpl();
+//        jdbcService.createUsersTable();
+//        System.out.println("JDBC");
+//        jdbcService.saveUser("Юрий", "Гагарин", (byte) 35);
+//        jdbcService.saveUser("Пётр", "Великий", (byte) 37);
+//        jdbcService.saveUser("Валентина", "Терешкова", (byte) 30);
+//        jdbcService.saveUser("Александра", "Потанина", (byte) 32);
+//        for (User item: jdbcService.getAllUsers()) {
+//            System.out.println(item);
+//        }
+//        jdbcService.cleanUsersTable();
+//        jdbcService.dropUsersTable();
 
         //   ******   hibernate   ******   //
         UserServiceImpl userService = new UserServiceImpl();
@@ -39,7 +39,7 @@ public class Main {
         userService.dropUsersTable();
 
         //    ******   CLose connections   ******   //
-        if (Util.getConnection() != null) {Util.getConnection().close();}
+//        if (Util.getConnection() != null) {Util.getConnection().close();}
         if (Util.getHibernateFactory() != null) {Util.getHibernateFactory().close();}
     }
 }
