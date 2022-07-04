@@ -16,22 +16,8 @@ import java.util.Properties;
 public class Util {
     // реализуйте настройку соеденения с БД
 
-    private static Connection connection;
     private static SessionFactory sessionFactory;
 
-    //  ********  jdbc  ********  //
-    public static Connection getConnection() throws SQLException {
-        try {
-            if (connection == null) {
-                connection = DriverManager.getConnection("jdbc:mysql://localhost/test1", "root", "admin123");
-            }
-            return connection;
-        } catch (SQLException e) {
-            System.out.println("При создании соединения JDBC произошла ошибка");
-            e.printStackTrace();
-        }
-        return null;
-    }
     //  ********  hibernate  ********  //
     public static SessionFactory getHibernateFactory () {
         try {
@@ -44,7 +30,6 @@ public class Util {
 //                connectProperties.put(Environment.SHOW_SQL,"true");
                 connectProperties.put(Environment.CURRENT_SESSION_CONTEXT_CLASS,"thread");
                 connectProperties.put(Environment.HBM2DDL_AUTO, "none");
-//                connectProperties.put(Environment.HBM2DDL_AUTO, "validate");
                 Configuration configuration = new Configuration();
                 configuration.setProperties(connectProperties);
                 configuration.addAnnotatedClass(User.class);
@@ -57,4 +42,20 @@ public class Util {
         }
         return null;
     }
+
+    //  ********  jdbc  ********  //
+    private static Connection connection;
+    public static Connection getConnection() {
+        try {
+            if (connection == null) {
+                connection = DriverManager.getConnection("jdbc:mysql://localhost/test1", "root", "admin123");
+            }
+            return connection;
+        } catch (SQLException e) {
+            System.out.println("При создании соединения JDBC произошла ошибка");
+//            e.printStackTrace();
+        }
+        return null;
+    }
+
 }
