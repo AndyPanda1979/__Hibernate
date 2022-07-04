@@ -16,11 +16,27 @@ public class UserServiceImpl implements UserService {
 
     UserDaoJDBCImpl userDaoJDBC = new UserDaoJDBCImpl();
     public void createUsersTable() throws SQLException {
-        userDaoJDBC.createUsersTable();
+        String rawSQL = """
+                CREATE TABLE IF NOT EXISTS `test1`.`users` (
+                  `id` BIGINT(64) NOT NULL AUTO_INCREMENT,
+                  `name` VARCHAR(45) NOT NULL,
+                  `lastName` VARCHAR(45) NOT NULL,
+                  `age` INT NOT NULL,
+                  PRIMARY KEY (`id`));""";
+        Session session = Util.getHibernateFactory().getCurrentSession();
+        session.beginTransaction();
+        Query query = session.createSQLQuery(rawSQL).addEntity(User.class);
+        query.executeUpdate();
+        session.getTransaction().commit();
     }
 
     public void dropUsersTable() throws SQLException {
-        userDaoJDBC.dropUsersTable();
+        String rawSQL = "DROP TABLE IF EXISTS `test1`.`users`;";
+        Session session = Util.getHibernateFactory().getCurrentSession();
+        session.beginTransaction();
+        Query query = session.createSQLQuery(rawSQL).addEntity(User.class);
+        query.executeUpdate();
+        session.getTransaction().commit();
     }
 
     public void saveUser(String name, String lastName, byte age) throws SQLException {
