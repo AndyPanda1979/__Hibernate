@@ -78,6 +78,9 @@ public class Main {
 //        System.out.println("Пробуем сохранить запись");
 //        userService.saveUser("Михаил", "Ломоносов", (byte) 33);
 //
+//        System.out.println("Очищаем таблицу");
+//        userService.cleanUsersTable();
+//
 //        if (Util.getHibernateFactory() != null) {Util.getHibernateFactory().close();}
     }
 }

@@ -143,8 +143,8 @@ public class UserDaoHibernateImpl implements UserDao {
             session.setFlushMode(FlushModeType.COMMIT);
             Transaction transaction = session.beginTransaction();
             Query q3 = session.createQuery("DELETE FROM User");
-            q3.executeUpdate();
             try {
+                q3.executeUpdate();
                 transaction.commit();
             } catch (Exception e) {
                 System.out.println("При выполнении операции произошла ошибка, откат действий (Очистка таблицы)");
