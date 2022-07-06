@@ -3,8 +3,11 @@ package jm.task.core.jdbc.dao;
 import jm.task.core.jdbc.model.User;
 import jm.task.core.jdbc.util.Util;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 
+import javax.persistence.FlushModeType;
 import javax.persistence.Query;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,10 +29,17 @@ public class UserDaoHibernateImpl implements UserDao {
 
         try {
             Session session = Util.getHibernateFactory().getCurrentSession();
-            session.beginTransaction();
+            session.setFlushMode(FlushModeType.COMMIT);
+            Transaction transaction = session.beginTransaction();
             Query query = session.createSQLQuery(rawSQL).addEntity(User.class);
-            query.executeUpdate();
-            session.getTransaction().commit();
+            try {
+                query.executeUpdate();
+                transaction.commit();
+            } catch (Exception e) {
+                System.out.println("При выполнении операции по созданию таблицы произошла ошибка, откат операции");
+                transaction.rollback();
+                e.printStackTrace();
+            }
         } catch (NullPointerException npe) {
             System.out.println("Операция не выполнена, не удалось подключиться к БД");
         }
@@ -41,10 +51,17 @@ public class UserDaoHibernateImpl implements UserDao {
         try {
             String rawSQL = "DROP TABLE IF EXISTS `test1`.`users`;";
             Session session = Util.getHibernateFactory().getCurrentSession();
-            session.beginTransaction();
+            session.setFlushMode(FlushModeType.COMMIT);
+            Transaction transaction = session.beginTransaction();
             Query query = session.createSQLQuery(rawSQL).addEntity(User.class);
-            query.executeUpdate();
-            session.getTransaction().commit();
+            try {
+                query.executeUpdate();
+                transaction.commit();
+            } catch (Exception e) {
+                System.out.println("При выполнении операции по удалению таблицы произошла ошибка, откат операции");
+                transaction.rollback();
+                e.printStackTrace();
+            }
         } catch (NullPointerException npe) {
             System.out.println("Операция не выполнена, не удалось подключиться к БД");
         }
@@ -54,11 +71,17 @@ public class UserDaoHibernateImpl implements UserDao {
     public void saveUser(String name, String lastName, byte age) {
         try {
             Session session = Util.getHibernateFactory().getCurrentSession();
-            session.beginTransaction();
-            session.save(new User(name, lastName, age));
-            session.flush();
-            System.out.println("User с именем " + name + " " + lastName + " добавлен в БД");
-            session.getTransaction().commit();
+            session.setFlushMode(FlushModeType.COMMIT);
+            Transaction transaction = session.beginTransaction();
+            try {
+                session.save(new User(name, lastName, age));
+                transaction.commit();
+                System.out.println("User с именем " + name + " " + lastName + " добавлен в БД");
+            } catch (Exception e) {
+                System.out.println("При выполнении операции произошла ошибка, сохранение не выполнено, откат действий");
+                transaction.rollback();
+                e.printStackTrace();
+            }
         } catch (NullPointerException npe) {
             System.out.println("Операция не выполнена, не удалось подключиться к БД");
         }
@@ -67,13 +90,25 @@ public class UserDaoHibernateImpl implements UserDao {
     @Override
     public void removeUserById(long id) {
         try {
+            boolean checkUser = false;
             Session session = Util.getHibernateFactory().getCurrentSession();
-            session.beginTransaction();
-            User user = session.get(User.class, id);
-            if (user != null) {
-                session.delete(user);
+            session.setFlushMode(FlushModeType.COMMIT);
+            Transaction transaction = session.beginTransaction();
+            try {
+                User user = session.get(User.class, id);
+                if (user != null) {
+                    checkUser = true;
+                    session.delete(user);
+                } else {
+                    System.out.println("Не найден пользователь с id" + id);
+                }
+                transaction.commit();
+                if (checkUser) {System.out.println("Удален пользователь c id " + id);}
+            } catch (Exception e) {
+                System.out.println("При выполнении операции произошла ошибка, удаление не выполнено, откат действий (Удаление пользователя)");
+                transaction.rollback();
+                e.printStackTrace();
             }
-            session.getTransaction().commit();
         } catch (NullPointerException npe) {
             System.out.println("Операция не выполнена, не удалось подключиться к БД");
         }
@@ -83,10 +118,18 @@ public class UserDaoHibernateImpl implements UserDao {
     public List<User> getAllUsers() {
         try {
             Session session = Util.getHibernateFactory().getCurrentSession();
-            session.beginTransaction();
-            List <User> users = session.createQuery("SELECT u FROM User u", User.class).getResultList();
-            session.getTransaction().commit();
-            return users;
+            session.setFlushMode(FlushModeType.COMMIT);
+            Transaction transaction = session.beginTransaction();
+            try {
+                List <User> users = session.createQuery("SELECT u FROM User u", User.class).getResultList();
+                transaction.commit();
+                return users;
+            } catch (Exception e) {
+                System.out.println("При выполнении операции произошла ошибка, данные не были получены");
+                transaction.rollback();
+                e.printStackTrace();
+                return new ArrayList<>();
+            }
         } catch (NullPointerException npe) {
             System.out.println("Операция не выполнена, не удалось подключиться к БД");
         }
@@ -97,10 +140,17 @@ public class UserDaoHibernateImpl implements UserDao {
     public void cleanUsersTable() {
         try {
             Session session = Util.getHibernateFactory().getCurrentSession();
-            session.beginTransaction();
+            session.setFlushMode(FlushModeType.COMMIT);
+            Transaction transaction = session.beginTransaction();
             Query q3 = session.createQuery("DELETE FROM User");
             q3.executeUpdate();
-            session.getTransaction().commit();
+            try {
+                transaction.commit();
+            } catch (Exception e) {
+                System.out.println("При выполнении операции произошла ошибка, откат действий (Очистка таблицы)");
+                transaction.rollback();
+                e.printStackTrace();
+            }
         } catch (NullPointerException npe) {
             System.out.println("Операция не выполнена, не удалось подключиться к БД");
         }
